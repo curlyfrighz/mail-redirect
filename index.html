@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Opening in Mail.app…</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      max-width: 36rem;
+      margin: 4rem auto;
+      padding: 0 1rem;
+      line-height: 1.5;
+    }
+    code {
+      background: rgba(127,127,127,0.15);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    a { color: #0066cc; }
+    @media (prefers-color-scheme: dark) { a { color: #6daaff; } }
+  </style>
+</head>
+<body>
+  <h1>Opening in Mail.app…</h1>
+  <p id="status">
+    If Mail.app didn't open automatically, your browser may have blocked the
+    redirect to the <code>message://</code> URL scheme. Use the link below.
+  </p>
+  <p><a id="manual" href="#">Open in Mail.app</a></p>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get('id');
+      if (!raw) {
+        document.getElementById('status').textContent =
+          'No message ID provided. URL must be /?id=<rfc822-message-id>.';
+        document.getElementById('manual').remove();
+        return;
+      }
+      // Accept either a raw Message-ID or one already wrapped with angle
+      // brackets (or their percent-encoded equivalents). Normalize, then
+      // wrap with %3C / %3E for the message:// scheme.
+      let mid = decodeURIComponent(raw).replace(/^<+|>+$/g, '');
+      const url = 'message://%3C' + encodeURIComponent(mid) + '%3E';
+      document.getElementById('manual').setAttribute('href', url);
+      window.location.replace(url);
+    })();
+  </script>
+</body>
+</html>
